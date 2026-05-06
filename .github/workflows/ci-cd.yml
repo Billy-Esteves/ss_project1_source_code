@@ -101,12 +101,12 @@ jobs:
 
       # CONTAINER SCANNING (Trivy)
       - name: Scan web image (Trivy)
-        uses: aquasecurity/trivy-action@latest
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: ghcr.io/${{ github.repository }}/app-web:latest
 
       - name: Scan db image (Trivy)
-        uses: aquasecurity/trivy-action@latest
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: ghcr.io/${{ github.repository }}/app-db:latest
 
