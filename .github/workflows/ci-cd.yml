@@ -112,5 +112,5 @@ jobs:
 
       - name: Push images
         run: |
-          docker push ghcr.io/${{ github.repository.lowercase }}/app-web:latest
-          docker push ghcr.io/${{ github.repository.lowercase }}/app-db:latest
+          docker push ghcr.io/${{ github.repository.lowercase() }}/app-web:latest
+          docker push ghcr.io/${{ github.repository.lowercase() }}/app-db:latest
