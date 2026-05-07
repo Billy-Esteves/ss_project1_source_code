@@ -7,7 +7,7 @@ import os
 import dotenv
 from . import db
 from . import utils
-from werkzeug.utils import secure_filename
+import logging
 
 dotenv.load_dotenv()
 
@@ -87,13 +87,26 @@ def register_routes(app):
             cur = conn.cursor()
 
             user = db.get_user_by_username(cur, username)
+            # Username [0] id [1] username [2] password [3] is_disabled
 
             cur.close()
             conn.close()
 
+            # Added check for user cause IDE was cryin about it
+
+            if user is None:
+                flask.flash("Invalid credentials.", "error")
+                return flask.render_template("login.html")
+            
+            # logging.warning(user[2]) # Shows user password
+
+
             is_admin = username == "admin"
 
-            if user and (user[2] == password and not user[3]) or is_admin:
+            # Original condition: if user and (user[2] == password and not user[3]) or is_admin:
+            # Removed the password skip for admin and "None" verification cause it's above now." 
+
+            if user[2] == password and not user[3]:
                 flask.session.clear()
                 flask.session["user_id"] = user[0] if username != "admin" else 1
                 flask.session["username"] = user[1] if username != "admin" else username
