@@ -1,5 +1,8 @@
 name: CI Pipeline
 
+env:
+  DEBUG_CD: true
+
 on:
   push:
     branches: [dev]
