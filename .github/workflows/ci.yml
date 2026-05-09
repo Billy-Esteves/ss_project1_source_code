@@ -69,7 +69,7 @@ jobs:
   test:
     name: Build & Integration Tests
     runs-on: ubuntu-latest
-    #needs: [security, lint]
+    needs: [security, lint]
 
     steps:
       - name: Checkout code
@@ -129,7 +129,7 @@ jobs:
   docker:
     name: Build Docker Image
     runs-on: ubuntu-latest
-    #needs: [test]
+    needs: [test]
 
     steps:
       - name: Checkout code
