@@ -139,17 +139,30 @@ def register_routes(app):
         return flask.redirect(flask.url_for("login"))
 
     @app.route("/documents/<int:document_id>")
+    @login_required
     def document_details(document_id):
+
+        #get id of user from session
+        user_id = flask.session.get("user_id")
+
         conn = get_db()
         cur = conn.cursor()
 
         # intentionally missing authorization check
+        #cur.execute(utils.prepare_query("""
+        #    SELECT id, owner_id, title, filename, metadata
+        #    FROM documents
+        #   WHERE id = %s
+        #    """,
+        #    (document_id,)))
+        
+        # add check for owner_id = user_id to prevent unauthorized access to documents
         cur.execute(utils.prepare_query("""
             SELECT id, owner_id, title, filename, metadata
             FROM documents
-            WHERE id = %s
+            WHERE id = %s AND owner_id = %s
             """,
-            (document_id,)))
+            (document_id, user_id)))
 
         row = cur.fetchone()
 
