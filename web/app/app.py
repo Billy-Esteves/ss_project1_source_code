@@ -11,6 +11,7 @@ import logging
 
 from werkzeug.security import generate_password_hash # type:ignore
 from werkzeug.security import check_password_hash # type:ignore
+from werkzeug.utils import secure_filename
 
 dotenv.load_dotenv()
 
@@ -231,20 +232,31 @@ def register_routes(app):
         upload_folder = BASE_DIR / app.config["UPLOAD_FOLDER"]
         upload_folder.mkdir(parents=True, exist_ok=True)
 
-        filename = utils.sanitize_filename(uploaded_file.filename)
-        destination = upload_folder / uploaded_file.filename
+        #filename = utils.sanitize_filename(uploaded_file.filename)
+        #destination = upload_folder / uploaded_file.filename
+        # Replaced the above two lines with secure_filename to prevent directory traversal and other filename issues.
+        filename = secure_filename(uploaded_file.filename)
+        destination = upload_folder / filename
         uploaded_file.save(destination)
         metadata = extract_metadata(destination)
 
         conn = get_db()
         cur = conn.cursor()
 
+        #cur.execute(
+        #    """
+        #    INSERT INTO documents (owner_id, title, filename, metadata)
+        #    VALUES (%s, %s, %s, %s)
+        #    """,
+        #    (user_id, title, uploaded_file.filename, metadata),
+        #)
+
         cur.execute(
             """
             INSERT INTO documents (owner_id, title, filename, metadata)
             VALUES (%s, %s, %s, %s)
             """,
-            (user_id, title, uploaded_file.filename, metadata),
+            (user_id, title, filename, metadata),
         )
         conn.commit()
 
