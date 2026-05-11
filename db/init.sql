@@ -2,7 +2,8 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    is_disabled BOOLEAN DEFAULT FALSE
+    is_disabled BOOLEAN DEFAULT FALSE,
+    is_admin BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE documents (
@@ -52,7 +53,7 @@ CREATE TABLE document_shares (
 --
 -- Removing or altering these accounts will cause automated validation to fail.
 -- ---------------------------------------------------------------------------
-INSERT INTO users (username, password, is_disabled) VALUES
-('admin', 'L|fP1D%327mB', FALSE),
-('alice', 'tth1mJj5?£58', FALSE),
-('bob', 'De586:Iq6}?!', FALSE);
+INSERT INTO users (username, password, is_disabled, is_admin) VALUES
+('admin', 'L|fP1D%327mB', FALSE, TRUE),
+('alice', 'tth1mJj5?£58', FALSE, FALSE),
+('bob', 'De586:Iq6}?!', FALSE, FALSE);

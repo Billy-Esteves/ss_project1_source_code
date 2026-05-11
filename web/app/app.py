@@ -1,13 +1,16 @@
 import functools
 import pathlib
 import os
-import psycopg2
-import flask
+import psycopg2 # type:ignore
+import flask # type:ignore
 import os
 import dotenv
 from . import db
 from . import utils
 import logging
+
+from werkzeug.security import generate_password_hash # type:ignore
+from werkzeug.security import check_password_hash # type:ignore
 
 dotenv.load_dotenv()
 
@@ -61,7 +64,7 @@ def get_documents_for_user(cur, owner_id):
         ORDER BY uploaded_at DESC
     """
     
-    cur.execute(query, (owner_id))
+    cur.execute(query, (owner_id,))
 
     return cur.fetchall()
 
@@ -98,7 +101,7 @@ def register_routes(app):
             cur = conn.cursor()
 
             user = db.get_user_by_username(cur, username)
-            # Username [0] id [1] username [2] password [3] is_disabled
+            # Username [0] id [1] username [2] password [3] is_disabled [4] is_admin
 
             cur.close()
             conn.close()
@@ -109,10 +112,11 @@ def register_routes(app):
                 flask.flash("Invalid credentials.", "error")
                 return flask.render_template("login.html")
             
-            # logging.warning(user[2]) # Shows user password
+            # logging.warning(user[2]) # Debug - Shows user password
 
+            is_admin = user [4]
 
-            is_admin = username == "admin"
+            logging.warning(user[4]) # Debug - Shows if user is admin
 
             # Original condition: if user and (user[2] == password and not user[3]) or is_admin:
             # Removed the password skip for admin and "None" verification cause it's above now." 
