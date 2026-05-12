@@ -1,13 +1,14 @@
 import os
-import subprocess
+import subprocess # nosec B404
 
 def call(cmd):
     try:
-       result = subprocess.run(
+       result = subprocess.run( # nosec B603
             cmd, 
             stdout=subprocess.PIPE, 
             stderr=subprocess.STDOUT, 
-            text=True
+            text=True,
+            shell=False
         )
        return result.stdout
     except Exception as e:

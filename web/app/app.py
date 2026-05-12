@@ -58,7 +58,7 @@ def get_documents_for_user(cur, owner_id):
     # """ % owner_id
     # cur.execute(query)
 
-    query = f"""
+    query = """
         SELECT id,title,filename,uploaded_at
         FROM documents
         WHERE owner_id=%s
