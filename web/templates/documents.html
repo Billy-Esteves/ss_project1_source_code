@@ -45,6 +45,11 @@
             Details
           </a>
         </td>
+        <td>
+          <a href="{{ url_for('download_document', id=doc.id) }}">
+            Download
+          </a>
+        </td>
         </tr>
       {% endfor %}
       </tbody>

@@ -24,6 +24,7 @@ DB_NAME = os.getenv("DB_NAME", "docdb")
 
 UPLOAD_FOLDER = "uploads"
 
+
 def get_db():
     return psycopg2.connect(
         host=DB_HOST,
@@ -303,6 +304,32 @@ def register_routes(app):
             return {"status": "ok"}, 200
         except Exception:
             return {"status": "error"}, 500
+
+
+    @app.route("/documents/<id>/download")
+    @login_required
+    def download_document(id):
+        user_id = flask.session.get("user_id")
+
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT filename
+            FROM documents
+            WHERE id = %s AND owner_id = %s
+        """, (id, user_id))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+
+        if not row:
+            return "Document not found", 404
+
+        filename = row[0]
+        upload_folder = BASE_DIR / app.config["UPLOAD_FOLDER"]
+
+        return flask.send_from_directory(upload_folder, filename, as_attachment=True)
+
 
 
     # ------------------------------------------------------------------
