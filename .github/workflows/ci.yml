@@ -64,6 +64,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r web/requirements.txt
+          python -m pip install --upgrade pip
 
       - name: Install lint tools
         run: pip install pylint
