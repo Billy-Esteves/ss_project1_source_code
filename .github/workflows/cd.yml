@@ -82,23 +82,27 @@ jobs:
 
       - name: Start staging stack
         run: |
+          # clean old state (important for CI reliability)
+          docker rm -f app-web-staging db || true
+          docker network rm app-net || true
+          docker network create app-net
 
+          # DB container (ALWAYS named "db" for consistency)
           docker run -d \
             --name db \
             --network app-net \
             ghcr.io/${{ github.repository }}/app-db:${{ github.sha }}
 
+          # Web container
           docker run -d \
             --name app-web-staging \
             --network app-net \
-            --network app-net \
             -p 8000:8000 \
-            -e DB_HOST=app-db-staging \
+            -e DB_HOST=db \
             -e DB_PORT=5432 \
             -e DB_USER=postgres \
             -e DB_PASSWORD=postgres \
             -e DB_NAME=docdb \
-            -p 8000:8000 \
             ghcr.io/${{ github.repository }}/app-web:${{ github.sha }}
 
       - name: Health check
