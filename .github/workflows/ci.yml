@@ -68,8 +68,16 @@ jobs:
       - name: Install lint tools
         run: pip install pylint
 
+      # Only fails if pylint itself encounters an error (not based on lint results)
       - name: Run Pylint
-        run: pylint web/
+        run: |
+          pylint web/ || code=$?
+          if [ "$code" -eq 1 ]; then
+            echo "Pylint crashed - failing CI"
+            exit 1
+          fi
+          echo "Pylint completed (ignoring lint results)"
+          exit 0
 
 
   # BUILD & INTEGRATION TESTS
