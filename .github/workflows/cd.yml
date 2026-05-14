@@ -133,6 +133,15 @@ jobs:
       - name: Pull staging image
         run: docker pull ghcr.io/${{ github.repository }}/app-web:${{ github.sha }}
 
+      - name: Start DB container
+        run: |
+          docker network create app-net || true
+
+          docker run -d \
+            --name app-db-staging \
+            --network app-net \
+            ghcr.io/${{ github.repository }}/app-db:${{ github.sha }}
+
       - name: Start staging container
         run: |
           docker network create app-net || true
