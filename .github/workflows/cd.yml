@@ -82,7 +82,6 @@ jobs:
 
       - name: Start staging stack
         run: |
-          docker network create app-net || true
 
           docker run -d \
             --name db \
