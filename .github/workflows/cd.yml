@@ -148,7 +148,7 @@ jobs:
           docker network create app-net || true
 
           docker run -d \
-            --name app-db-staging \
+            --name db \
             --network app-net \
             ghcr.io/${{ github.repository }}/app-db:${{ github.sha }}
 
