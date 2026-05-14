@@ -165,7 +165,7 @@ jobs:
       - name: Build and push image (cached)
         uses: docker/build-push-action@v7
         with:
-          context: .
+          context: ./web
           push: true
           tags: |
             ghcr.io/${{ github.repository }}/secure-coding-api:${{ github.sha }}
