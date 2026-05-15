@@ -685,7 +685,7 @@ def register_routes(app):
     @app.route("/admin/users")
     @login_required
     @admin_required
-    def get_admin_users():
+    def admin_get_users():
 
         # Open DB connection
         conn = get_db()
@@ -720,7 +720,7 @@ def register_routes(app):
             
         # Return butifull tables
         return flask.render_template(
-            "admin_users.html",
+            "users.html",
             users=users,
         )
     
@@ -768,7 +768,7 @@ def register_routes(app):
         # Report Mega Sucess
         flask.flash("User enabled successfully.", "success")
 
-        return flask.redirect(flask.url_for("admin_users"))
+        return flask.redirect(flask.url_for("admin_get_users"))
 
     @app.route("/admin/users/<int:id>/disable", methods=["POST"])
     @login_required
@@ -814,7 +814,7 @@ def register_routes(app):
         # Report Mega Sucess
         flask.flash("User disabled successfully.", "success")
 
-        return flask.redirect(flask.url_for("admin_users"))
+        return flask.redirect(flask.url_for("admin_get_users"))
 
 
     # ------------------------------------------------------------------
