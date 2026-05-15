@@ -193,6 +193,24 @@ def login_required(fn):
 
     return wrapper
 
+# Wrapper that mandates user to be admin
+def admin_required(fn):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+    
+        if "user_id" not in flask.session:
+            flask.flash("To acess please log in first.", "error")
+            return flask.redirect(flask.url_for("login"))
+
+        if not flask.session.get("is_admin"):
+            flask.abort(403)
+
+        return fn(*args, **kwargs)
+    
+
+    return wrapper
+
+
 def register_routes(app):
     """
     Register all application routes.
@@ -272,6 +290,7 @@ def register_routes(app):
                 flask.session.clear()
                 flask.session["user_id"] = user[0]
                 flask.session["username"] = user[1]
+                flask.session["is_admin"] = user[4]
                 return flask.redirect(flask.url_for("documents_page"))
 
             flask.flash("Invalid credentials.", "error")
@@ -654,6 +673,148 @@ def register_routes(app):
         ]
 
         return flask.render_template("shared_documents.html", documents=shared_docs)
+    
+
+
+
+
+
+    # Endpoint 5 - GET /admin/users
+    # Lists all users
+
+    @app.route("/admin/users")
+    @login_required
+    @admin_required
+    def get_admin_users():
+
+        # Open DB connection
+        conn = get_db()
+        cur = conn.cursor()
+
+        # Run DB query that gets all users
+        cur.execute("""
+            SELECT id, username, is_disabled, is_admin
+            FROM users
+            ORDER BY id"""
+        )
+
+        # Retrive resulting users
+        raw_users = cur.fetchall()
+
+        # Close connection
+        cur.close()
+        conn.close()
+
+        # Create and compose user list
+        users = []
+
+        for usr in raw_users:
+            users.append(
+                {
+                    "id": usr[0],
+                    "username": usr[1],
+                    "is_disabled": usr[2],
+                    "is_admin": usr[3],
+                }
+            )
+            
+        # Return butifull tables
+        return flask.render_template(
+            "admin_users.html",
+            users=users,
+        )
+    
+    @app.route("/admin/users/<int:id>/enable", methods=["POST"])
+    @login_required
+    @admin_required
+    def enable_user(id):
+
+        # Open DB connection
+        conn = get_db()
+        cur = conn.cursor()
+
+        # Run DB query that returns user with id match
+        cur.execute("""
+            SELECT id
+            FROM users
+            WHERE id = %s""",
+            (id,)
+        )
+
+        # Retrive user
+        row = cur.fetchone()
+
+        # Case not user
+        if not row:
+            cur.close()
+            conn.close()
+            flask.abort(404)
+
+        # Run DB update to change is_disabled to False
+        cur.execute("""
+            UPDATE users
+            SET is_disabled = FALSE
+            WHERE id = %s""",
+            (id,)
+        )
+
+        # Commit update
+        conn.commit()
+
+        # Close connection
+        cur.close()
+        conn.close()
+
+        # Report Mega Sucess
+        flask.flash("User enabled successfully.", "success")
+
+        return flask.redirect(flask.url_for("admin_users"))
+
+    @app.route("/admin/users/<int:id>/disable", methods=["POST"])
+    @login_required
+    @admin_required
+    def disable_user(id):
+
+        # Open DB connection
+        conn = get_db()
+        cur = conn.cursor()
+
+        # Run DB query that returns user with id match
+        cur.execute("""
+            SELECT id
+            FROM users
+            WHERE id = %s""",
+            (id,)
+        )
+
+        # Retrive user
+        row = cur.fetchone()
+
+        # Case not user
+        if not row:
+            cur.close()
+            conn.close()
+            flask.abort(404)
+
+        # Run DB update to change is_disabled to True
+        cur.execute("""
+            UPDATE users
+            SET is_disabled = TRUE
+            WHERE id = %s""",
+            (id,)
+        )
+
+        # Commit update
+        conn.commit()
+
+        # Close connection
+        cur.close()
+        conn.close()
+
+        # Report Mega Sucess
+        flask.flash("User disabled successfully.", "success")
+
+        return flask.redirect(flask.url_for("admin_users"))
 
 
     # ------------------------------------------------------------------

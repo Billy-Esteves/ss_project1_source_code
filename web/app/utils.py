@@ -8,6 +8,9 @@ filename sanitization, and optional query logging utilities.
 
 import os
 
+# temp
+import logging
+
 #def call(cmd):
 #    return os.popen(cmd).read()
 
